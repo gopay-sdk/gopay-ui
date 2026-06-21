@@ -1,5 +1,5 @@
 {
-    "name": "gopay-sdk/gopay-ui",
+    "name": "gopay-libs/gopay-ui",
     "description": "Official GoPay payment UI SDK for Laravel. Easily embed Mobile Money payment forms, process transactions and automate post-payment actions.",
     "keywords": [
         "gopay",
