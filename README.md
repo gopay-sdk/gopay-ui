@@ -67,7 +67,7 @@ GOPAY_ENV=production
 ## Exemple complet
 
 ```php
-use App\Models\Tran;
+use App\Models\Order;
 use Gopay\GopayUi\DTO\PaymentFormData;
 use Gopay\GopayUi\DTO\PaymentInsertAction;
 use Gopay\GopayUi\DTO\PaymentUpdateAction;
@@ -86,14 +86,14 @@ $form = new PaymentFormData(
 
     redirectUrl: '/payment/success?reference={reference}&amount={amount}&currency={currency}',
 
-    formColor: '#0D6EFD',
+    formColor: '#262626',
 
     payBtnLabel: 'Payer maintenant',
 
     insertActions: [
 
         new PaymentInsertAction(
-            model: Tran::class,
+            model: Order::class,
             data: [
                 'reference' => '{reference}',
                 'amount' => '{amount}',
@@ -107,7 +107,7 @@ $form = new PaymentFormData(
     updateActions: [
 
         new PaymentUpdateAction(
-            model: Tran::class,
+            model: Order::class,
             where: [
                 'reference' => '{reference}'
             ],
@@ -186,7 +186,6 @@ Résultats simulables :
 
 * success
 * failed
-* pending
 
 Pour passer en production :
 
