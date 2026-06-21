@@ -22,7 +22,7 @@ SDK officiel GoPay permettant d'intégrer facilement les paiements Mobile Money 
 ## Installation
 
 ```bash
-composer require gopay/gopay-ui
+composer require gopay-libs/gopay-ui
 ```
 
 Puis :
