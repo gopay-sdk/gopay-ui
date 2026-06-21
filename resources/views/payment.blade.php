@@ -1,9 +1,11 @@
 @php
     $mf = number_format($dto->amount, 3, ',', ' ') . ' ' . $dto->currency;
     $formColor = $dto->formColor;
+    $css = file_get_contents(app('gopay-ui-path') . '/resources/files/gopay.css');
+    $css = str_replace('DATAFORMCOLOR', $formColor, $css);
 @endphp
 <style>
-    {!! file_get_contents(app('gopay-ui-path') . '/resources/files/gopay.css') !!}
+    {!! $css !!}
 </style>
 
 <div id="gopay-wrapper">
@@ -13,7 +15,7 @@
     </div>
 
     <div class="w-100" id="gopay-div" style="display:none;">
-        <div class="card bg-white rounded shadow-md m-2">
+        <div class="card bg-white rounded shadow-md m-1">
             <div class="card-header bg-dark text-white text-center bg-color">
                 <h4>
                     <div class="d-inline-flex align-items-center gap-2">
@@ -73,11 +75,11 @@
                     <input type="hidden" name="reference" value="{{ $reference }}">
                     <input type="hidden" name="signature" value="{{ $signature }}">
                     <hr>
-                    <h3 class="mb-3">Montant à payer : <b>{{ $mf }}</b> </h3>
+                    <h3 style="margin-bottom: 20px">Montant à payer : <b>{{ $mf }}</b> </h3>
                     <div class="form-outline mb-3 input-group eflex-nowrap">
                         <span class="input-group-text" id="addon-wrapping">+243</span>
-                        <input required id="gopay-phone" class="form-control" name="phone"
-                            value="{{ $dto->phone }}" />
+                        <input required id="gopay-phone" class="form-control" name="phone" value="{{ $dto->phone }}"
+                            style="border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important;" />
                         <label class="form-label" for="gopay-phone">Numéro mobile money</label>
                     </div>
 
@@ -114,7 +116,7 @@
                                 dans votre fichier <code>.env</code>.
                             </div>
                         </div>
-                        <div class=" mb-3">
+                        <div class="mb-3">
                             <label class="form-label">
                                 Résultat du paiement simulé
                             </label>
@@ -140,10 +142,10 @@
                     <div class="text-right mt-5">
                         <small class="text-muted">
                             © {{ date('Y') }}
-                            <a href="https://gopay.gooomart.com?source=ui" style="color:#262626"
+                            <a href="https://gopay.gooomart.com?source=sdk" style="color:#262626"
                                 target="_blank">GoPAY</a>
                             · Powered by
-                            <a href="https://gooomart.com?source=ui" class="text-warning"
+                            <a href="https://gooomart.com?source=sdk" class="text-warning"
                                 target="_blank">Gooomart</a>
                         </small>
                     </div>
@@ -153,57 +155,29 @@
     </div>
 </div>
 
-<style>
-    #gopay-wrapper {
-        position: relative;
-        min-height: 250px;
-    }
-
-    #gopay-loader {
-        position: absolute;
-        inset: 0;
-        background: rgba(255, 255, 255, 0.92);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        backdrop-filter: blur(4px);
-    }
-
-    .gopay-spinner {
-        width: 45px;
-        height: 45px;
-        border: 4px solid #eee;
-        border-top: 4px solid {{ $formColor }};
-        border-radius: 50%;
-        animation: spin 0.5s linear infinite;
-        margin-bottom: 12px;
-    }
-
-    .gopay-text {
-        font-size: 14px;
-        color: #333;
-        font-weight: 500;
-        letter-spacing: 0.2px;
-    }
-
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
-    }
-</style>
 <script>
     {!! file_get_contents(app('gopay-ui-path') . '/resources/files/jq.min.js') !!}
-</script>
-<script>
     {!! file_get_contents(app('gopay-ui-path') . '/resources/files/jquery.mask.min.js') !!}
 </script>
 <script>
-    {!! file_get_contents(app('gopay-ui-path') . '/resources/files/gopay.js') !!}
-</script>
-<script>
+    const wrapper = document.getElementById('gopay-wrapper');
+    wrapper.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn');
+        if (!btn || !wrapper.contains(btn)) {
+            return;
+        }
+        const ripple = document.createElement('span');
+        ripple.className = 'gopay-ripple';
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        ripple.style.width = size + 'px';
+        ripple.style.height = size + 'px';
+        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+        btn.appendChild(ripple);
+        ripple.addEventListener('animationend', () => ripple.remove());
+    });
+
     var gopayform = $('#gopay-form');
     var pinput = $('#gopay-phone', gopayform);
     var paybtnlabel = '{{ $dto->payBtnLabel }}'
@@ -246,13 +220,13 @@
                     rep.html(res.message).removeClass();
                     rep.addClass('alert alert-success');
                     rep.slideDown();
-                    gopayform.html(`<div class="my-5 text-center">
+                    gopayform.html(`<div class="text-center" style="margin:5rem 0;">
                             <p class="text-success">
-                                <div class='d-inline-flex align-items-center gap-2 font-weight-bold text-success'>${icon.check} <span class='h3'> VOTRE TRANSANCTION A R&Eacute;USSIE !</span></div>
+                                <div class='d-inline-flex align-items-center gap-2 font-weight-bold text-success'>${icon.check} <h3> VOTRE TRANSANCTION A R&Eacute;USSIE !</h3></div>
                             </p>
                             <p id="ltimer"></p>
                         </div>`);
-                    let seconds = 5;
+                    let seconds = 10;
                     var ltimer = $('#ltimer');
                     const timer = setInterval(() => {
                         ltimer.html(
@@ -288,9 +262,9 @@
                     var rep = $('#rep', gopayform);
                     var html = `<div class="my-2 text-center">
                             <p>
-                                <div class='d-inline-flex align-items-center gap-2 font-weight-bold text-danger'>${icon.close} <span class='h3 ml-2'> VOTRE PAIEMENT A &Eacute;CHOU&Eacute; !</span></div>
+                                <div class='d-inline-flex align-items-center gap-2 font-weight-bold text-danger'>${icon.close} <h3> VOTRE TRANSANCTION A &Eacute;CHOU&Eacute; !</h3></div>
                             </p>
-                            <p>Vous avez peut-être saisie un mauvais pin ou votre solde est insuffisant.</p>
+                            <p>Vous avez peut-être saisi un mauvais pin ou votre solde est insuffisant.</p>
                         </div>`;
                     rep.html(html).removeClass().addClass('alert alert-danger');
                 }
@@ -390,15 +364,35 @@
             setTimeout(() => {
                 loader.style.display = 'none';
                 content.style.display = 'block';
-                $('.form-outline', this).each((i, el) => {
-                    new mdb.Input(el).update();
-                });
+
+                const wrapper = document.getElementById('gopay-wrapper');
+                if (!wrapper) return;
+
+                function refreshFloatingLabel(input) {
+                    const outline = input.closest('.form-outline');
+                    if (!outline) return;
+                    if (input.value.trim() !== '' || input === document.activeElement) {
+                        outline.classList.add('active');
+                    } else {
+                        outline.classList.remove('active');
+                    }
+                }
+
+                wrapper.querySelectorAll('.form-outline .form-control')
+                    .forEach(input => {
+                        refreshFloatingLabel(input);
+                        input.addEventListener('focus', () => {
+                            refreshFloatingLabel(input);
+                        });
+                        input.addEventListener('blur', () => {
+                            refreshFloatingLabel(input);
+                        });
+                        input.addEventListener('input', () => {
+                            refreshFloatingLabel(input);
+                        });
+                    });
+
             }, 500);
         }, 300);
     })
 </script>
-<style>
-    #gopay-div *>.bg-color {
-        background-color: {{ $formColor }} !important;
-    }
-</style>
