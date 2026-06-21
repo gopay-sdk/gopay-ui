@@ -1,0 +1,73 @@
+{
+    "name": "mecxer713/gopay-php",
+    "description": "Un package PHP universel (Laravel & Symfony) pour intégrer l'API GoPAY",
+    "type": "library",
+    "keywords": [
+        "gopay", 
+        "payment", 
+        "payout", 
+        "laravel", 
+        "symfony", 
+        "api", 
+        "mobile-money", 
+        "fintech"
+    ],
+    "homepage": "https://gopay.gooomart.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mecxer713",
+            "email": "mecxer@gmail.com",
+            "role": "Developer "
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/Mecxer713/gopay-php/issues",
+        "source": "https://github.com/Mecxer713/gopay-php"
+    },
+    "require": {
+        "php": "^8.0",
+        "guzzlehttp/guzzle": "^7.2"
+    },
+    "require-dev": {
+        "illuminate/support": "^9.0|^10.0|^11.0",
+        "laravel/pint": "^1.29",
+        "pestphp/pest": "^4.7",
+        "phpstan/phpstan": "^2.2",
+        "symfony/config": "^5.4|^6.0|^7.0",
+        "symfony/dependency-injection": "^5.4|^6.0|^7.0",
+        "symfony/http-kernel": "^5.4|^6.0|^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mecxer713\\GoPay\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mecxer713\\GoPay\\GoPayServiceProvider"
+            ],
+            "aliases": {
+                "GoPay": "Mecxer713\\GoPay\\Facades\\GoPay"
+            }
+        }
+    },
+    "scripts": {
+        "test": "pest",
+        "analyse": "phpstan analyse",
+        "format": "pint",
+        "format:test": "pint --test"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}

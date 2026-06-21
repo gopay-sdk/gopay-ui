@@ -1,0 +1,66 @@
+{
+    "name": "gopay/gopay-ui",
+    "description": "Official GoPay payment UI SDK for Laravel. Easily embed Mobile Money payment forms, process transactions and automate post-payment actions.",
+    "keywords": [
+        "gopay",
+        "mobile-money",
+        "payment",
+        "payments",
+        "laravel",
+        "sdk",
+        "checkout",
+        "fintech",
+        "congo",
+        "rdc"
+    ],
+    "homepage": "https://gopay.gooomart.com",
+    "license": "MIT",
+    "type": "library",
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0",
+        "mecxer713/gopay-php": "^1.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Gopay\\GopayUi\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Gopay\\GopayUi\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Gopay\\GopayUi\\GopayUiServiceProvider"
+            ]
+        }
+    },
+    "authors": [
+        {
+            "name": "GoPay",
+            "homepage": "https://gopay.gooomart.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "gopay@gooomart.com",
+        "issues": "https://github.com/gopay/gopay-ui/issues",
+        "source": "https://github.com/gopay/gopay-ui"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require-dev": {
+        "pestphp/pest": "^3.8"
+    },
+    "scripts": {
+        "test": "pest"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
