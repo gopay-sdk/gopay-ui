@@ -156,243 +156,371 @@
 </div>
 
 <script>
-    {!! file_get_contents(app('gopay-ui-path') . '/resources/files/jq.min.js') !!}
-    {!! file_get_contents(app('gopay-ui-path') . '/resources/files/jquery.mask.min.js') !!}
-</script>
-<script>
-    const wrapper = document.getElementById('gopay-wrapper');
-    wrapper.addEventListener('click', function(e) {
-        const btn = e.target.closest('.btn');
-        if (!btn || !wrapper.contains(btn)) {
+    (function() {
+        {!! file_get_contents(app('gopay-ui-path') . '/resources/files/jq.min.js') !!}
+        {!! file_get_contents(app('gopay-ui-path') . '/resources/files/jquery.mask.min.js') !!}
+
+        const $gopayQuery = jQuery.noConflict(true);
+        const wrapper = document.getElementById('gopay-wrapper');
+        if (!wrapper) {
             return;
         }
-        const ripple = document.createElement('span');
-        ripple.className = 'gopay-ripple';
-        const rect = btn.getBoundingClientRect();
-        const size = Math.max(rect.width, rect.height);
-        ripple.style.width = size + 'px';
-        ripple.style.height = size + 'px';
-        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-        btn.appendChild(ripple);
-        ripple.addEventListener('animationend', () => ripple.remove());
-    });
+        wrapper.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn');
+            if (!btn || !wrapper.contains(btn)) {
+                return;
+            }
+            const ripple = document.createElement('span');
+            ripple.className = 'gopay-ripple';
+            const rect = btn.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.width = size + 'px';
+            ripple.style.height = size + 'px';
+            ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+            ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+            btn.appendChild(ripple);
+            ripple.addEventListener('animationend', function() {
+                ripple.remove();
+            });
+        });
 
-    var gopayform = $('#gopay-form');
-    var pinput = $('#gopay-phone', gopayform);
-    var paybtnlabel = '{{ $dto->payBtnLabel }}'
-    const icon = {
-        idle: `<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#fff"> <path d="M226.67-80q-27.5 0-47.09-19.58Q160-119.17 160-146.67v-422.66q0-27.5 19.58-47.09Q199.17-636 226.67-636h60v-90.67q0-80.23 56.57-136.78T480.07-920q80.26 0 136.76 56.55 56.5 56.55 56.5 136.78V-636h60q27.5 0 47.09 19.58Q800-596.83 800-569.33v422.66q0 27.5-19.58 47.09Q760.83-80 733.33-80H226.67Zm0-66.67h506.66v-422.66H226.67v422.66Zm308.5-155.85Q558-325.04 558-356.67q0-31-22.95-55.16Q512.11-436 479.89-436t-55.06 24.17Q402-387.67 402-356.33q0 31.33 22.95 53.83 22.94 22.5 55.16 22.5t55.06-22.52ZM353.33-636h253.34v-90.67q0-52.77-36.92-89.72-36.93-36.94-89.67-36.94-52.75 0-89.75 36.94-37 36.95-37 89.72V-636ZM226.67-146.67v-422.66 422.66Z"/></svg>`,
-        loading: `<svg width="18" height="18" viewBox="0 0 50 50" fill="none"><circle cx="25" cy="25" r="20" stroke="white" stroke-width="5" stroke-linecap="round" stroke-dasharray="31.4 31.4"> <animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="0.8s" repeatCount="indefinite" /></circle></svg>`,
-        check: `<svg xmlns="http://www.w3.org/2000/svg" height="50px" viewBox="0 -960 960 960" width="50px" fill="#00b74a"><path d="M422-297.33 704.67-580l-49.34-48.67L422-395.33l-118-118-48.67 48.66L422-297.33ZM480-80q-82.33 0-155.33-31.5-73-31.5-127.34-85.83Q143-251.67 111.5-324.67T80-480q0-83 31.5-156t85.83-127q54.34-54 127.34-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82.33-31.5 155.33-31.5 73-85.5 127.34Q709-143 636-111.5T480-80Zm0-66.67q139.33 0 236.33-97.33t97-236q0-139.33-97-236.33t-236.33-97q-138.67 0-236 97-97.33 97-97.33 236.33 0 138.67 97.33 236 97.33 97.33 236 97.33ZM480-480Z"/></svg>`,
-        close: `<svg xmlns="http://www.w3.org/2000/svg" height="50px" viewBox="0 -960 960 960" width="50px" fill="#f93154"><path d="m332-285.33 148-148 148 148L674.67-332l-148-148 148-148L628-674.67l-148 148-148-148L285.33-628l148 148-148 148L332-285.33ZM480-80q-82.33 0-155.33-31.5-73-31.5-127.34-85.83Q143-251.67 111.5-324.67T80-480q0-83 31.5-156t85.83-127q54.34-54 127.34-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82.33-31.5 155.33-31.5 73-85.5 127.34Q709-143 636-111.5T480-80Zm0-66.67q139.33 0 236.33-97.33t97-236q0-139.33-97-236.33t-236.33-97q-138.67 0-236 97-97.33 97-97.33 236.33 0 138.67 97.33 236 97.33 97.33 236 97.33ZM480-480Z"/></svg>`
-    };
+        const gopayform = $gopayQuery('#gopay-form');
+        const pinput = $gopayQuery('#gopay-phone', gopayform);
+        const paybtnlabel = '{{ $dto->payBtnLabel }}';
 
-    $(':submit', gopayform).html(
-        `<div class='d-inline-flex align-items-center'>${icon.idle} <span class='ml-2'>${paybtnlabel}</span></div>`
-    );
+        const icon = {
 
-    pinput.mask('000000000');
+            idle: `<svg xmlns="http://www.w3.org/2000/svg"
+                    height="20px"
+                    viewBox="0 -960 960 960"
+                    width="20px"
+                    fill="#fff">
+                    <path d="M226.67-80q-27.5 0-47.09-19.58Q160-119.17 160-146.67v-422.66q0-27.5 19.58-47.09Q199.17-636 226.67-636h60v-90.67q0-80.23 56.57-136.78T480.07-920q80.26 0 136.76 56.55 56.5 56.55 56.5 136.78V-636h60q27.5 0 47.09 19.58Q800-596.83 800-569.33v422.66q0 27.5-19.58 47.09Q760.83-80 733.33-80H226.67Zm0-66.67h506.66v-422.66H226.67v422.66Zm308.5-155.85Q558-325.04 558-356.67q0-31-22.95-55.16Q512.11-436 479.89-436t-55.06 24.17Q402-387.67 402-356.33q0 31.33 22.95 53.83 22.94 22.5 55.16 22.5t55.06-22.52ZM353.33-636h253.34v-90.67q0-52.77-36.92-89.72-36.93-36.94-89.67-36.94-52.75 0-89.75 36.94-37 36.95-37 89.72V-636ZM226.67-146.67v-422.66 422.66Z"/>
+                </svg>`,
 
-    REF = '';
-    var cancheck = false;
+            loading: `<svg width="18"
+                       height="18"
+                       viewBox="0 0 50 50"
+                       fill="none">
+                    <circle cx="25"
+                            cy="25"
+                            r="20"
+                            stroke="white"
+                            stroke-width="5"
+                            stroke-linecap="round"
+                            stroke-dasharray="31.4 31.4">
+                        <animateTransform
+                            attributeName="transform"
+                            type="rotate"
+                            from="0 25 25"
+                            to="360 25 25"
+                            dur="0.8s"
+                            repeatCount="indefinite" />
+                    </circle>
+                </svg>`,
 
-    var callback = function() {
-        if (!cancheck) return;
-        $.ajax({
-            url: '{{ route('gopay.check') }}',
-            data: {
-                myref: REF
-            },
-            success: function(res) {
-                var trans = res.transaction;
-                var status = trans?.status;
-                // 'success|failed|pending'
-                if (status === 'success') {
-                    cancheck = false;
-                    // PAYMENT WAS SUCCESS !!
-                    var btn = $(':submit', gopayform).attr('disabled', false);
-                    btn.html(
-                        `<div class='d-inline-flex align-items-center gap-2'>${icon.idle} <span class='ml-2'>${paybtnlabel}</span></div>`
-                    );
-                    btn.removeClass('btn-danger').addClass('btn-dark');
-                    rep = $('#rep', gopayform);
-                    rep.html(res.message).removeClass();
-                    rep.addClass('alert alert-success');
-                    rep.slideDown();
-                    gopayform.html(`<div class="text-center" style="margin:5rem 0;">
-                            <p class="text-success">
-                                <div class='d-inline-flex align-items-center gap-2 font-weight-bold text-success'>${icon.check} <h3> VOTRE TRANSANCTION A R&Eacute;USSIE !</h3></div>
-                            </p>
+            check: `<svg xmlns="http://www.w3.org/2000/svg"
+                      height="50px"
+                      viewBox="0 -960 960 960"
+                      width="50px"
+                      fill="#00b74a">
+                    <path d="M422-297.33 704.67-580l-49.34-48.67L422-395.33l-118-118-48.67 48.66L422-297.33ZM480-80q-82.33 0-155.33-31.5-73-31.5-127.34-85.83Q143-251.67 111.5-324.67T80-480q0-83 31.5-156t85.83-127q54.34-54 127.34-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82.33-31.5 155.33-31.5 73-85.5 127.34Q709-143 636-111.5T480-80Zm0-66.67q139.33 0 236.33-97.33t97-236q0-139.33-97-236.33t-236.33-97q-138.67 0-236 97-97.33 97-97.33 236.33 0 138.67 97.33 236 97.33 97.33 236 97.33ZM480-480Z"/>
+                </svg>`,
+
+            close: `<svg xmlns="http://www.w3.org/2000/svg"
+                      height="50px"
+                      viewBox="0 -960 960 960"
+                      width="50px"
+                      fill="#f93154">
+                    <path d="m332-285.33 148-148 148 148L674.67-332l-148-148 148-148L628-674.67l-148 148-148-148L285.33-628l148 148-148 148L332-285.33ZM480-80q-82.33 0-155.33-31.5-73-31.5-127.34-85.83Q143-251.67 111.5-324.67T80-480q0-83 31.5-156t85.83-127q54.34-54 127.34-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 82.33-31.5 155.33-31.5 73-85.5 127.34Q709-143 636-111.5T480-80Zm0-66.67q139.33 0 236.33-97.33t97-236q0-139.33-97-236.33t-236.33-97q-138.67 0-236 97-97.33 97-97.33 236.33 0 138.67 97.33 236 97.33 97.33 236 97.33ZM480-480Z"/>
+                </svg>`
+        };
+
+        $gopayQuery(':submit', gopayform).html(
+            `<div class="d-inline-flex align-items-center">
+            ${icon.idle}
+            <span class="ml-2">${paybtnlabel}</span>
+        </div>`
+        );
+
+        pinput.mask('000000000');
+
+        let REF = '';
+        let cancheck = false;
+
+        const callback = function() {
+            if (!cancheck) {
+                return;
+            }
+            $gopayQuery.ajax({
+                url: '{{ route('gopay.check') }}',
+                data: {
+                    myref: REF
+                },
+                success: function(res) {
+                    const trans = res.transaction;
+                    const status = trans?.status;
+                    // success | failed | pending
+                    if (status === 'success') {
+                        cancheck = false;
+                        // Paiement réussi
+                        const btn = $gopayQuery(':submit', gopayform)
+                            .attr('disabled', false);
+                        btn.html(
+                            `<div class="d-inline-flex align-items-center gap-2">
+                            ${icon.idle}
+                            <span class="ml-2">${paybtnlabel}</span>
+                        </div>`
+                        );
+                        btn.removeClass('btn-danger')
+                            .addClass('btn-dark');
+                        const rep = $gopayQuery('#rep', gopayform);
+                        rep.html(res.message)
+                            .removeClass()
+                            .addClass('alert alert-success')
+                            .slideDown();
+                        gopayform.html(
+                            `<div class="text-center" style="margin:5rem 0;">
+                            <div class="d-inline-flex align-items-center gap-2
+                                        font-weight-bold text-success">
+                                ${icon.check}
+                                <h3>
+                                    VOTRE TRANSACTION A RÉUSSI !
+                                </h3>
+                            </div>
                             <p id="ltimer"></p>
-                        </div>`);
-                    let seconds = 10;
-                    var ltimer = $('#ltimer');
-                    const timer = setInterval(() => {
-                        ltimer.html(
-                            `Redirection dans ${seconds} seconde(s)...`);
-                        seconds--;
-                        if (seconds < 0) {
-                            clearInterval(timer);
-                            const action = res.action || {};
-                            switch (action.onSuccess) {
-                                case 'refresh_page':
-                                    window.location.reload();
-                                    break;
-                                case 'go_to_url':
-                                    if (action.redirectUrl) {
-                                        window.location.href = action.redirectUrl;
-                                    }
-                                    break;
-                                default:
-                                    console.warn('Unknown onSuccess action:', action
-                                        .onSuccess);
+                        </div>`
+                        );
+                        let seconds = 10;
+                        const ltimer = $gopayQuery('#ltimer');
+                        const timer = setInterval(function() {
+                            ltimer.html(
+                                `Redirection dans ${seconds} seconde(s)...`
+                            );
+                            seconds--;
+                            if (seconds < 0) {
+                                clearInterval(timer);
+                                const action = res.action || {};
+                                switch (action.onSuccess) {
+                                    case 'refresh_page':
+                                        window.location.reload();
+                                        break;
+                                    case 'go_to_url':
+                                        if (action.redirectUrl) {
+                                            window.location.href =
+                                                action.redirectUrl;
+                                        }
+                                        break;
+                                    default:
+                                        console.warn(
+                                            'Unknown onSuccess action:',
+                                            action.onSuccess
+                                        );
+                                }
                             }
-                        }
-                    }, 1000);
-
-                } else if (status === 'failed') {
-                    cancheck = false;
-                    $('#btncancel').hide();
-                    $('#btnclose').show();
-                    var btn = $(':submit', gopayform).attr('disabled', false);
-                    btn.html(
-                        `<div class='d-inline-flex align-items-center gap-2'>${icon.idle} <span class='ml-2'>${paybtnlabel}</span></div>`
-                    );
-                    var rep = $('#rep', gopayform);
-                    var html = `<div class="my-2 text-center">
+                        }, 1000);
+                    } else if (status === 'failed') {
+                        cancheck = false;
+                        $gopayQuery('#btncancel').hide();
+                        $gopayQuery('#btnclose').show();
+                        const btn = $gopayQuery(':submit', gopayform)
+                            .attr('disabled', false);
+                        btn.html(
+                            `<div class="d-inline-flex align-items-center gap-2">
+                            ${icon.idle}
+                            <span class="ml-2">${paybtnlabel}</span>
+                        </div>`
+                        );
+                        const rep = $gopayQuery('#rep', gopayform);
+                        const html =
+                            `<div class="my-2 text-center">
+                            <div class="d-inline-flex align-items-center gap-2
+                                        font-weight-bold text-danger">
+                                ${icon.close}
+                                <h3>
+                                    VOTRE TRANSACTION A ÉCHOUÉ !
+                                </h3>
+                            </div>
                             <p>
-                                <div class='d-inline-flex align-items-center gap-2 font-weight-bold text-danger'>${icon.close} <h3> VOTRE TRANSANCTION A &Eacute;CHOU&Eacute; !</h3></div>
+                                Vous avez peut-être saisi un mauvais PIN
+                                ou votre solde est insuffisant.
                             </p>
-                            <p>Vous avez peut-être saisi un mauvais pin ou votre solde est insuffisant.</p>
                         </div>`;
-                    rep.html(html).removeClass().addClass('alert alert-danger');
-                }
-            }
-        }).always(function() {
-            if (cancheck) {
-                setTimeout(() => {
-                    callback();
-                }, 3000);
-            }
-        });
-    }
-
-    $('#btncancel').click(function() {
-        cancheck = false;
-        $(this).hide();
-        var btn = $(':submit', gopayform).attr('disabled', false);
-        btn.html(
-            `<div class='d-inline-flex align-items-center gap-2'>${icon.idle} <span class='ml-2'>${paybtnlabel}</span></div>`
-        );
-        btn.removeClass('btn-dark').addClass('btn-dark');
-        var rep = $('#rep', gopayform);
-        rep.html("Paiement annulé.").removeClass();
-        rep.addClass('alert alert-warning');
-    });
-    gopayform.submit(function() {
-        event.preventDefault();
-        rep = $('#rep', gopayform);
-        rep.stop().slideUp();
-        if (pinput.val().toString().length != 9) {
-            rep.html("Numéro de téléphone non valide");
-            rep.removeClass();
-            rep.addClass('alert alert-danger');
-            rep.stop();
-            rep.slideDown();
-            return;
-        }
-
-        var btn = $(':submit', gopayform).attr('disabled', true);
-        btn.html(
-            `<div class='d-inline-flex align-items-center gap-2'>${icon.loading} <span class='ml-2'>${paybtnlabel}</span></div>`
-        );
-        var data = gopayform.serialize();
-        $.ajax({
-            url: '{{ route('gopay.init') }}',
-            type: 'POST',
-            data: data,
-            timeout: 30000,
-            success: function(res) {
-                if (res.success == true) {
-                    rep.html(res.message).removeClass();
-                    rep.addClass('alert alert-success');
-                    rep.slideDown();
-                    btn.html(
-                        `<div class='d-inline-flex align-items-center'>${icon.loading} <span class='ml-2'>En attente de validation</span></div>`
-                    );;
-                    btn.attr('disabled', true).removeClass('btn-dark').addClass(
-                        'btn-danger');
-                    REF = res.data.myref;
-                    $('#btncancel').show();
-
-                    cancheck = true;
-                    @if (config('gopay.environment') === 'sandbox')
-                        setTimeout(() => {
-                            callback();
-                        }, 3000);
-                    @else
-                        callback();
-                    @endif
-                } else {
-                    var m = res.message;
-                    rep.removeClass().addClass('alert alert-danger').html(m)
-                        .slideDown();
-                    btn.attr('disabled', false).html(
-                        `<div class='d-inline-flex align-items-center gap-2'>${icon.idle} <span class='ml-2'>${paybtnlabel}</span></div>`
-                    );
-                }
-            },
-            error: function(resp) {
-                var mess = resp.responseJSON?.message ??
-                    "Une erreur s'est produite, merci de réessayer";
-                rep.removeClass().addClass('alert alert-danger').html(mess)
-                    .slideDown();
-                btn.attr('disabled', false).html(
-                    `<div class='d-inline-flex align-items-center gap-2'>${icon.idle} <span class='ml-2'>${paybtnlabel}</span></div>`
-                );
-            }
-        });
-    });
-
-    $(function() {
-        const loader = document.getElementById('gopay-loader');
-        const content = document.getElementById('gopay-div');
-        setTimeout(() => {
-            loader.style.opacity = '0';
-            loader.style.transition = 'opacity 0.3s ease';
-            setTimeout(() => {
-                loader.style.display = 'none';
-                content.style.display = 'block';
-
-                const wrapper = document.getElementById('gopay-wrapper');
-                if (!wrapper) return;
-
-                function refreshFloatingLabel(input) {
-                    const outline = input.closest('.form-outline');
-                    if (!outline) return;
-                    if (input.value.trim() !== '' || input === document.activeElement) {
-                        outline.classList.add('active');
-                    } else {
-                        outline.classList.remove('active');
+                        rep.html(html)
+                            .removeClass()
+                            .addClass('alert alert-danger');
                     }
                 }
+            }).always(function() {
+                if (cancheck) {
+                    setTimeout(function() {
+                        callback();
+                    }, 3000);
+                }
+            });
+        };
 
-                wrapper.querySelectorAll('.form-outline .form-control')
-                    .forEach(input => {
-                        refreshFloatingLabel(input);
-                        input.addEventListener('focus', () => {
-                            refreshFloatingLabel(input);
-                        });
-                        input.addEventListener('blur', () => {
-                            refreshFloatingLabel(input);
-                        });
-                        input.addEventListener('input', () => {
-                            refreshFloatingLabel(input);
-                        });
-                    });
+        $gopayQuery('#btncancel').click(function() {
+            cancheck = false;
+            $gopayQuery(this).hide();
+            const btn = $gopayQuery(':submit', gopayform)
+                .attr('disabled', false);
+            btn.html(
+                `<div class="d-inline-flex align-items-center gap-2">
+                ${icon.idle}
+                <span class="ml-2">${paybtnlabel}</span>
+            </div>`
+            );
+            btn.removeClass('btn-dark')
+                .addClass('btn-dark');
+            const rep = $gopayQuery('#rep', gopayform);
+            rep.html('Paiement annulé.')
+                .removeClass()
+                .addClass('alert alert-warning');
+        });
 
-            }, 500);
-        }, 300);
-    })
+        gopayform.on('submit', function(event) {
+            event.preventDefault();
+            const rep = $gopayQuery('#rep', gopayform);
+            rep.stop().slideUp();
+            if (pinput.val().toString().length !== 9) {
+                rep.html('Numéro de téléphone non valide')
+                    .removeClass()
+                    .addClass('alert alert-danger')
+                    .stop()
+                    .slideDown();
+                return;
+            }
+            const btn = $gopayQuery(':submit', gopayform)
+                .attr('disabled', true);
+            btn.html(
+                `<div class="d-inline-flex align-items-center gap-2">
+                ${icon.loading}
+                <span class="ml-2">${paybtnlabel}</span>
+            </div>`
+            );
+            const data = gopayform.serialize();
+            $gopayQuery.ajax({
+                url: '{{ route('gopay.init') }}',
+                type: 'POST',
+                data: data,
+                timeout: 30000,
+                success: function(res) {
+                    if (res.success === true) {
+                        rep.html(res.message)
+                            .removeClass()
+                            .addClass('alert alert-success')
+                            .slideDown();
+                        btn.html(
+                            `<div class="d-inline-flex align-items-center">
+                            ${icon.loading}
+                            <span class="ml-2">
+                                En attente de validation
+                            </span>
+                        </div>`
+                        );
+                        btn.attr('disabled', true)
+                            .removeClass('btn-dark')
+                            .addClass('btn-danger');
+                        REF = res.data.myref;
+                        $gopayQuery('#btncancel').show();
+                        cancheck = true;
+                        @if (config('gopay.environment') === 'sandbox')
+                            setTimeout(function() {
+                                callback();
+                            }, 3000);
+                        @else
+                            callback();
+                        @endif
+                    } else {
+                        const m = res.message;
+                        rep.removeClass()
+                            .addClass('alert alert-danger')
+                            .html(m)
+                            .slideDown();
+                        btn.attr('disabled', false)
+                            .html(
+                                `<div class="d-inline-flex align-items-center gap-2">
+                                ${icon.idle}
+                                <span class="ml-2">
+                                    ${paybtnlabel}
+                                </span>
+                            </div>`
+                            );
+                    }
+                },
+                error: function(resp) {
+                    const mess =
+                        resp.responseJSON?.message ??
+                        "Une erreur s'est produite, merci de réessayer";
+                    rep.removeClass()
+                        .addClass('alert alert-danger')
+                        .html(mess)
+                        .slideDown();
+                    btn.attr('disabled', false)
+                        .html(
+                            `<div class="d-inline-flex align-items-center gap-2">
+                            ${icon.idle}
+                            <span class="ml-2">
+                                ${paybtnlabel}
+                            </span>
+                        </div>`
+                        );
+                }
+            });
+        });
+
+        $gopayQuery(function() {
+            const loader = document.getElementById('gopay-loader');
+            const content = document.getElementById('gopay-div');
+            if (!loader || !content) {
+                return;
+            }
+            setTimeout(function() {
+                loader.style.opacity = '0';
+                loader.style.transition = 'opacity 0.3s ease';
+                setTimeout(function() {
+                    loader.style.display = 'none';
+                    content.style.display = 'block';
+                    const wrapper =
+                        document.getElementById('gopay-wrapper');
+                    if (!wrapper) {
+                        return;
+                    }
+
+                    function refreshFloatingLabel(input) {
+                        const outline =
+                            input.closest('.form-outline');
+                        if (!outline) {
+                            return;
+                        }
+                        if (
+                            input.value.trim() !== '' ||
+                            input === document.activeElement
+                        ) {
+                            outline.classList.add('active');
+                        } else {
+                            outline.classList.remove('active');
+                        }
+                    }
+                    wrapper
+                        .querySelectorAll(
+                            '.form-outline .form-control'
+                        )
+                        .forEach(function(input) {
+                            refreshFloatingLabel(input);
+                            input.addEventListener('focus', function() {
+                                refreshFloatingLabel(input);
+                            });
+                            input.addEventListener('blur', function() {
+                                refreshFloatingLabel(input);
+                            });
+                            input.addEventListener('input', function() {
+                                refreshFloatingLabel(input);
+                            });
+                        });
+                }, 500);
+            }, 300);
+        });
+    })();
 </script>
